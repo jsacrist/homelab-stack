@@ -1,0 +1,103 @@
+services:
+  plex:
+    # On first run, go to <IP-ADDR>:32400/web/
+    image: plexinc/pms-docker
+    container_name: plex_container
+    network_mode: host
+    restart: always
+    volumes:
+      - /PATH_TO_YOUR_SYSTEM/appdata/PlexMediaServer:/config
+      - /PATH_TO_YOUR_SYSTEM/media:/data/
+      - /dev/shm/:/transcode
+    environment:
+      - TZ=America/Winnipeg
+      - VERSION=latest
+      # - PLEX_CLAIM=
+      # - PLEX_UID=99
+      # - PLEX_GID=100
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr_container
+    volumes:
+      - /dev/rtc:/dev/rtc
+      - /PATH_TO_YOUR_SYSTEM/appdata/sonarr:/config
+      - /PATH_TO_YOUR_SYSTEM/media:/media/
+    environment:
+      - TZ=America/Winnipeg
+    ports:
+      - 8989:8989
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr_container
+    volumes:
+      - /PATH_TO_YOUR_SYSTEM/appdata/radarr:/config
+      - /PATH_TO_YOUR_SYSTEM/media:/media
+    environment:
+      - TZ=America/Winnipeg
+    ports:
+      - 7878:7878
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr_container
+    volumes:
+      - /PATH_TO_YOUR_SYSTEM/appdata/prowlarr:/config
+    environment:
+      - TZ=America/Winnipeg
+      - UMASK=022
+      # - PUID=99
+      # - PGID=100
+    ports:
+      - 9696:9696
+  binhex-qbittorrentvpn:
+    # On first run, credentials are "admin":"adminadmin"
+    image: binhex/arch-qbittorrentvpn
+    container_name: binhex_qbittorrentvpn_container
+    volumes:
+      - /PATH_TO_YOUR_SYSTEM/appdata/binhex-qbittorrentvpn:/config
+      - /PATH_TO_YOUR_SYSTEM/media:/media/
+    environment:
+      - TZ=America/Winnipeg
+      - WEBUI_PORT=8080
+      - STRICT_PORT_FORWARD=yes
+      - LAN_NETWORK="192.168.1.0/24"
+      - ENABLE_PRIVOXY=no
+      - DEBUG=false
+      - UMASK=000
+      - VPN_ENABLED=no
+      # - VPN_USER=
+      # - VPN_PASS=
+      # - VPN_PROV= # pia, airvpn, custom
+      # - VPN_OPTIONS=
+      # - PUID=99
+      # - PGID=100
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 8118:8118
+      - 6889:6889
+      - 16889:16889
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: overseerr_container
+    restart: unless-stopped
+    volumes:
+      - /PATH_TO_YOUR_SYSTEM/appdata/overseerr:/config
+    environment:
+      - TZ=America/Winnipeg
+      - LOG_LEVEL=info
+      - UMASK=022
+      # - PUID=99
+      # - PGID=100
+    ports:
+      - 5055:5055
+  portainer:
+    image: portainer/portainer
+    container_name: portainer_container
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /PATH_TO_YOUR_SYSTEM/appdata/portainer:/data
+    environment:
+      - TZ=America/Winnipeg
+    ports:
+      - 9000:9000
