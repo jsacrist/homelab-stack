@@ -1,13 +1,12 @@
 services:
-  plex:
-    # On first run, go to <IP-ADDR>:32400/web/
+  plex: # <IP-ADDR>:32400/web/
     image: plexinc/pms-docker
     container_name: plex_container
+    restart: unless-stopped
     network_mode: host
-    restart: always
     volumes:
-      - /media/plexmedia/appdata/PlexMediaServer:/config
-      - /media/plexmedia/media:/data/
+      - ${MEDIA_DIR}/appdata/PlexMediaServer:/config
+      - ${MEDIA_DIR}/media:/data/
       - /dev/shm/:/transcode
     environment:
       - TZ=America/Winnipeg
@@ -15,39 +14,51 @@ services:
       # - PLEX_CLAIM=
       # - PLEX_UID=99
       # - PLEX_GID=100
-  sonarr:
+
+  jellyfin: # <IP-ADDR>:5055/
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    user: 1000:1000
+    network_mode: "host"
+    volumes:
+      - ${MEDIA_DIR}/appdata/jellyfin:/config
+
+  sonarr: # <IP-ADDR>:8989/
     image: linuxserver/sonarr
     container_name: sonarr_container
-    restart: always
+    restart: unless-stopped
     volumes:
       - /dev/rtc:/dev/rtc
-      - /media/plexmedia/appdata/sonarr:/config
-      - /media/plexmedia/media:/media/
+      - ${MEDIA_DIR}/appdata/sonarr:/config
+      - ${MEDIA_DIR}/media:/media/
     environment:
       - TZ=America/Winnipeg
       - PUID=1000
       - PGID=1000
     ports:
       - 8989:8989
-  radarr:
+
+  radarr: # <IP-ADDR>:7878/
     image: linuxserver/radarr
     container_name: radarr_container
-    restart: always
+    restart: unless-stopped
     volumes:
-      - /media/plexmedia/appdata/radarr:/config
-      - /media/plexmedia/media:/media
+      - ${MEDIA_DIR}/appdata/radarr:/config
+      - ${MEDIA_DIR}/media:/media
     environment:
       - TZ=America/Winnipeg
       - PUID=1000
       - PGID=1000
     ports:
       - 7878:7878
-  prowlarr:
+
+  prowlarr: # <IP-ADDR>:9696/
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr_container
-    restart: always
+    restart: unless-stopped
     volumes:
-      - /media/plexmedia/appdata/prowlarr:/config
+      - ${MEDIA_DIR}/appdata/prowlarr:/config
     environment:
       - TZ=America/Winnipeg
       - UMASK=022
@@ -55,14 +66,15 @@ services:
       - PGID=1000
     ports:
       - 9696:9696
-  binhex-qbittorrentvpn:
+
+  binhex-qbittorrentvpn: # <IP-ADDR>:8080/
     # On first run, credentials are "admin":"adminadmin"
     image: binhex/arch-qbittorrentvpn
     container_name: binhex_qbittorrentvpn_container
-    restart: always
+    restart: unless-stopped
     volumes:
-      - /media/plexmedia/appdata/binhex-qbittorrentvpn:/config
-      - /media/plexmedia/media:/media/
+      - ${MEDIA_DIR}/appdata/binhex-qbittorrentvpn:/config
+      - ${MEDIA_DIR}/media:/media/
     environment:
       - TZ=America/Winnipeg
       - WEBUI_PORT=8080
@@ -84,12 +96,14 @@ services:
       - 8118:8118
       - 6889:6889
       - 16889:16889
-  overseerr:
-    image: lscr.io/linuxserver/overseerr:latest
-    container_name: overseerr_container
-    restart: always
+
+  seerr: # <IP-ADDR>:5055/
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
+    restart: unless-stopped
+    init: true
     volumes:
-      - /media/plexmedia/appdata/overseerr:/config
+      - ${MEDIA_DIR}/appdata/seerr:/app/config
     environment:
       - TZ=America/Winnipeg
       - LOG_LEVEL=info
@@ -98,13 +112,20 @@ services:
       - PGID=1000
     ports:
       - 5055:5055
-  portainer:
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/settings/public || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+
+  portainer: # <IP-ADDR>:9000/
     image: portainer/portainer
     container_name: portainer_container
-    restart: always
+    restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /media/plexmedia/appdata/portainer:/data
+      - ${MEDIA_DIR}/appdata/portainer:/data
     environment:
       - TZ=America/Winnipeg
     ports:
