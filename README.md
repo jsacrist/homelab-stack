@@ -38,7 +38,7 @@ NOTE: "Compose" commands (those starting with `docker compose`) need to be execu
 | `docker compose pause` | Pauses running containers of a service
 | `docker compose unpause` | Unpauses paused containers of a service
 | `docker compose up` | Builds, (re)creates, starts, and attaches to containers for a service
-| `docker compose up -d` | Builds, (re)creates, starts containers for a service (and detaches CLI)
+| `docker compose up -d` | Builds, (re)creates, starts containers for a service (and detaches CLI)  Restarting on the latest version of images
 | `docker compose pull` | Pulls (downloads) images associated with a service defined in your compose yaml file.
 | `docker compose down` | Stops containers, and removes containers, networks, volumes, and images created by `up`
 |-|-|

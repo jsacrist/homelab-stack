@@ -6,8 +6,8 @@ services:
     network_mode: host
     restart: always
     volumes:
-      - /PATH_TO_YOUR_SYSTEM/appdata/PlexMediaServer:/config
-      - /PATH_TO_YOUR_SYSTEM/media:/data/
+      - /media/plexmedia/appdata/PlexMediaServer:/config
+      - /media/plexmedia/media:/data/
       - /dev/shm/:/transcode
     environment:
       - TZ=America/Winnipeg
@@ -18,43 +18,51 @@ services:
   sonarr:
     image: linuxserver/sonarr
     container_name: sonarr_container
+    restart: always
     volumes:
       - /dev/rtc:/dev/rtc
-      - /PATH_TO_YOUR_SYSTEM/appdata/sonarr:/config
-      - /PATH_TO_YOUR_SYSTEM/media:/media/
+      - /media/plexmedia/appdata/sonarr:/config
+      - /media/plexmedia/media:/media/
     environment:
       - TZ=America/Winnipeg
+      - PUID=1000
+      - PGID=1000
     ports:
       - 8989:8989
   radarr:
     image: linuxserver/radarr
     container_name: radarr_container
+    restart: always
     volumes:
-      - /PATH_TO_YOUR_SYSTEM/appdata/radarr:/config
-      - /PATH_TO_YOUR_SYSTEM/media:/media
+      - /media/plexmedia/appdata/radarr:/config
+      - /media/plexmedia/media:/media
     environment:
       - TZ=America/Winnipeg
+      - PUID=1000
+      - PGID=1000
     ports:
       - 7878:7878
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr_container
+    restart: always
     volumes:
-      - /PATH_TO_YOUR_SYSTEM/appdata/prowlarr:/config
+      - /media/plexmedia/appdata/prowlarr:/config
     environment:
       - TZ=America/Winnipeg
       - UMASK=022
-      # - PUID=99
-      # - PGID=100
+      - PUID=1000
+      - PGID=1000
     ports:
       - 9696:9696
   binhex-qbittorrentvpn:
     # On first run, credentials are "admin":"adminadmin"
     image: binhex/arch-qbittorrentvpn
     container_name: binhex_qbittorrentvpn_container
+    restart: always
     volumes:
-      - /PATH_TO_YOUR_SYSTEM/appdata/binhex-qbittorrentvpn:/config
-      - /PATH_TO_YOUR_SYSTEM/media:/media/
+      - /media/plexmedia/appdata/binhex-qbittorrentvpn:/config
+      - /media/plexmedia/media:/media/
     environment:
       - TZ=America/Winnipeg
       - WEBUI_PORT=8080
@@ -63,13 +71,13 @@ services:
       - ENABLE_PRIVOXY=no
       - DEBUG=false
       - UMASK=000
+      - PUID=1000
+      - PGID=1000
       - VPN_ENABLED=no
       # - VPN_USER=
       # - VPN_PASS=
       # - VPN_PROV= # pia, airvpn, custom
       # - VPN_OPTIONS=
-      # - PUID=99
-      # - PGID=100
     ports:
       - 8080:8080
       - 6881:6881
@@ -79,15 +87,15 @@ services:
   overseerr:
     image: lscr.io/linuxserver/overseerr:latest
     container_name: overseerr_container
-    restart: unless-stopped
+    restart: always
     volumes:
-      - /PATH_TO_YOUR_SYSTEM/appdata/overseerr:/config
+      - /media/plexmedia/appdata/overseerr:/config
     environment:
       - TZ=America/Winnipeg
       - LOG_LEVEL=info
       - UMASK=022
-      # - PUID=99
-      # - PGID=100
+      - PUID=1000
+      - PGID=1000
     ports:
       - 5055:5055
   portainer:
@@ -96,7 +104,7 @@ services:
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /PATH_TO_YOUR_SYSTEM/appdata/portainer:/data
+      - /media/plexmedia/appdata/portainer:/data
     environment:
       - TZ=America/Winnipeg
     ports:
