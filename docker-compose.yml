@@ -1,7 +1,7 @@
 services:
   plex: # <IP-ADDR>:32400/web/
     image: plexinc/pms-docker
-    container_name: plex_container
+    container_name: plex
     restart: unless-stopped
     network_mode: host
     volumes:
@@ -26,7 +26,7 @@ services:
 
   sonarr: # <IP-ADDR>:8989/
     image: linuxserver/sonarr
-    container_name: sonarr_container
+    container_name: sonarr
     restart: unless-stopped
     volumes:
       - /dev/rtc:/dev/rtc
@@ -41,7 +41,7 @@ services:
 
   radarr: # <IP-ADDR>:7878/
     image: linuxserver/radarr
-    container_name: radarr_container
+    container_name: radarr
     restart: unless-stopped
     volumes:
       - ${MEDIA_DIR}/appdata/radarr:/config
@@ -55,7 +55,7 @@ services:
 
   prowlarr: # <IP-ADDR>:9696/
     image: lscr.io/linuxserver/prowlarr:latest
-    container_name: prowlarr_container
+    container_name: prowlarr
     restart: unless-stopped
     volumes:
       - ${MEDIA_DIR}/appdata/prowlarr:/config
@@ -70,7 +70,7 @@ services:
   binhex-qbittorrentvpn: # <IP-ADDR>:8080/
     # On first run, credentials are "admin":"adminadmin"
     image: binhex/arch-qbittorrentvpn
-    container_name: binhex_qbittorrentvpn_container
+    container_name: binhex_qbittorrentvpn
     restart: unless-stopped
     volumes:
       - ${MEDIA_DIR}/appdata/binhex-qbittorrentvpn:/config
@@ -121,7 +121,7 @@ services:
 
   portainer: # <IP-ADDR>:9000/
     image: portainer/portainer
-    container_name: portainer_container
+    container_name: portainer
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
