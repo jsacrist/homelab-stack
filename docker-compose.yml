@@ -1,7 +1,7 @@
 services:
   plex: # <IP-ADDR>:32400/web/
     image: plexinc/pms-docker
-    container_name: plex
+    container_name: plex_container
     restart: unless-stopped
     network_mode: host
     volumes:
@@ -10,23 +10,40 @@ services:
       - /dev/shm/:/transcode
     environment:
       - TZ=America/Winnipeg
-      - VERSION=latest
-      # - PLEX_CLAIM=
-      # - PLEX_UID=99
-      # - PLEX_GID=100
+      - VERSION=docker
+      - PLEX_UID=1000
+      - PLEX_GID=1000
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
+    devices:
+      - /dev/dri:/dev/dri
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+              options:
+                nvidia_visible_devices: all
 
-  jellyfin: # <IP-ADDR>:5055/
+  jellyfin: # <IP-ADDR>:8096
     image: jellyfin/jellyfin:latest
     container_name: jellyfin
     restart: unless-stopped
-    user: 1000:1000
+    user: "1000:1000"
     network_mode: "host"
+    environment:
+      - JELLYFIN_UserUid=1000
+      - JELLYFIN_UserGid=1000
     volumes:
       - ${MEDIA_DIR}/appdata/jellyfin:/config
+      - ${MEDIA_DIR}/appdata/jellyfin-cache:/cache
+      - ${MEDIA_DIR}/media:/data:ro
 
   sonarr: # <IP-ADDR>:8989/
     image: linuxserver/sonarr
-    container_name: sonarr
+    container_name: sonarr_container
     restart: unless-stopped
     volumes:
       - /dev/rtc:/dev/rtc
@@ -41,7 +58,7 @@ services:
 
   radarr: # <IP-ADDR>:7878/
     image: linuxserver/radarr
-    container_name: radarr
+    container_name: radarr_container
     restart: unless-stopped
     volumes:
       - ${MEDIA_DIR}/appdata/radarr:/config
@@ -55,7 +72,7 @@ services:
 
   prowlarr: # <IP-ADDR>:9696/
     image: lscr.io/linuxserver/prowlarr:latest
-    container_name: prowlarr
+    container_name: prowlarr_container
     restart: unless-stopped
     volumes:
       - ${MEDIA_DIR}/appdata/prowlarr:/config
@@ -70,7 +87,7 @@ services:
   binhex-qbittorrentvpn: # <IP-ADDR>:8080/
     # On first run, credentials are "admin":"adminadmin"
     image: binhex/arch-qbittorrentvpn
-    container_name: binhex_qbittorrentvpn
+    container_name: binhex_qbittorrentvpn_container
     restart: unless-stopped
     volumes:
       - ${MEDIA_DIR}/appdata/binhex-qbittorrentvpn:/config
@@ -121,7 +138,7 @@ services:
 
   portainer: # <IP-ADDR>:9000/
     image: portainer/portainer
-    container_name: portainer
+    container_name: portainer_container
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
